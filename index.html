@@ -1,0 +1,701 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Imóvel Motion AI</title>
+
+<style>
+:root {
+  --bg: #0b0e0c;
+  --panel: #141a16;
+  --border: #29352c;
+  --green: #b7ff61;
+  --text: #f4f7f2;
+  --muted: #9ba89e;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, Arial, sans-serif;
+}
+
+header {
+  padding: 22px 6%;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo {
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.logo span { color: var(--green); }
+
+.tag {
+  font-size: 11px;
+  color: var(--green);
+  border: 1px solid var(--border);
+  padding: 7px 10px;
+  border-radius: 20px;
+}
+
+main {
+  max-width: 1120px;
+  margin: auto;
+  padding: 35px 20px 70px;
+}
+
+h1 {
+  font-size: clamp(30px, 5vw, 48px);
+  margin: 0 0 12px;
+  letter-spacing: -1.5px;
+}
+
+h1 span { color: var(--green); }
+
+.subtitle {
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 620px;
+  margin-bottom: 32px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 0.85fr;
+  gap: 22px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  padding: 22px;
+  min-width: 0;
+}
+
+h2 {
+  font-size: 17px;
+  margin: 0 0 18px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  color: #d9e2da;
+  margin: 18px 0 8px;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 9px;
+  background: #0b100d;
+  border: 1px solid var(--border);
+  color: white;
+}
+
+.upload {
+  border: 1px dashed #526b54;
+  border-radius: 12px;
+  padding: 25px 12px;
+  text-align: center;
+  cursor: pointer;
+  background: #101711;
+}
+
+.upload strong {
+  display: block;
+  margin-bottom: 7px;
+}
+
+.upload small {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+#photos { display: none; }
+
+#photoList {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.thumb {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #202820;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb span {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 5px;
+  background: #000b;
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  max-height: 440px;
+  object-fit: contain;
+  background: #080a08;
+  border-radius: 11px;
+}
+
+.preview-note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 12px 0;
+}
+
+button {
+  width: 100%;
+  padding: 13px;
+  border-radius: 9px;
+  border: 0;
+  font-weight: 750;
+  cursor: pointer;
+  margin-top: 10px;
+  background: var(--green);
+  color: #10160c;
+}
+
+button.secondary {
+  background: #222d24;
+  color: white;
+  border: 1px solid var(--border);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+#status {
+  color: var(--green);
+  font-size: 13px;
+  line-height: 1.5;
+  margin-top: 13px;
+  overflow-wrap: anywhere;
+}
+
+#download {
+  display: none;
+  text-align: center;
+  margin-top: 16px;
+  color: var(--green);
+}
+
+#download a { color: var(--green); }
+
+.footer {
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+  margin-top: 30px;
+}
+
+@media (max-width: 760px) {
+  .layout { grid-template-columns: 1fr; }
+  header { padding: 18px 5%; }
+  main { padding: 28px 14px 50px; }
+  .panel { padding: 17px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="logo">IMÓVEL <span>MOTION AI</span></div>
+  <div class="tag">ESTÚDIO IMOBILIÁRIO</div>
+</header>
+
+<main>
+  <h1>Transforme fotos em vídeos <span>cinematográficos.</span></h1>
+
+  <p class="subtitle">
+    Organize as fotos de um imóvel, escolha os movimentos
+    de câmera e crie um vídeo para sua próxima produção imobiliária.
+  </p>
+
+  <div class="layout">
+    <section class="panel">
+      <h2>01 / Configurar projeto</h2>
+
+      <label for="projectName">Nome do imóvel</label>
+      <input id="projectName" placeholder="Ex.: Apartamento no Centro">
+
+      <label>Fotos dos ambientes</label>
+      <label class="upload" for="photos">
+        <strong>＋ Adicionar fotos</strong>
+        <small>
+          Selecione várias imagens JPG, PNG ou WebP.<br>
+          As imagens serão processadas neste navegador.
+        </small>
+      </label>
+      <input id="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+
+      <div id="photoCount" class="preview-note">Nenhuma foto adicionada.</div>
+      <div id="photoList"></div>
+
+      <label for="format">Formato do vídeo</label>
+      <select id="format">
+        <option value="vertical">Vertical — 9:16 (Reels)</option>
+        <option value="horizontal">Horizontal — 16:9 (YouTube)</option>
+        <option value="square">Quadrado — 1:1</option>
+      </select>
+
+      <label for="duration">Duração por foto</label>
+      <select id="duration">
+        <option value="3">3 segundos</option>
+        <option value="4" selected>4 segundos</option>
+        <option value="5">5 segundos</option>
+        <option value="6">6 segundos</option>
+      </select>
+
+      <label for="motion">Movimento de câmera</label>
+      <select id="motion">
+        <option value="zoom">Zoom cinematográfico</option>
+        <option value="out">Afastamento de câmera</option>
+        <option value="pan">Panorâmica lateral</option>
+        <option value="mix">Movimentos variados</option>
+      </select>
+
+      <button id="previewBtn" class="secondary">
+        ▶ Pré-visualizar
+      </button>
+
+      <button id="renderBtn" disabled>
+        Gerar e baixar vídeo
+      </button>
+
+      <div id="status">Adicione fotos para começar.</div>
+    </section>
+
+    <section class="panel">
+      <h2>02 / Prévia do vídeo</h2>
+
+      <canvas id="canvas" width="720" height="1280"></canvas>
+
+      <p class="preview-note">
+        A prévia usa movimentos simulados por animação.
+        O resultado final será gravado pelo navegador em WebM.
+        Ainda não há geração de ambientes por IA nem música.
+      </p>
+
+      <div id="download"></div>
+    </section>
+  </div>
+
+  <p class="footer">
+    Imóvel Motion AI · Protótipo de produção audiovisual
+  </p>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const canvas = $("canvas");
+const ctx = canvas.getContext("2d");
+
+let photos = [];
+let animationStart = performance.now();
+let raf;
+let recording = false;
+let previewing = false;
+let downloadUrl = null;
+
+const sceneSeconds = () => Number($("duration").value);
+const totalSeconds = () => photos.length * sceneSeconds();
+
+function setStatus(message) {
+  $("status").textContent = message;
+}
+
+function resizeCanvas() {
+  const format = $("format").value;
+
+  if (format === "horizontal") {
+    canvas.width = 1280;
+    canvas.height = 720;
+  } else if (format === "square") {
+    canvas.width = 900;
+    canvas.height = 900;
+  } else {
+    canvas.width = 720;
+    canvas.height = 1280;
+  }
+
+  drawFrame(0);
+}
+
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+
+    image.onload = () => resolve({
+      image,
+      name: file.name,
+      url
+    });
+
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Não foi possível abrir " + file.name));
+    };
+
+    image.src = url;
+  });
+}
+
+$("photos").addEventListener("change", async event => {
+  const files = Array.from(event.target.files || []);
+
+  if (!files.length) return;
+
+  const validFiles = files.filter(file =>
+    ["image/jpeg", "image/png", "image/webp"].includes(file.type)
+  );
+
+  if (!validFiles.length) {
+    setStatus("Escolha imagens JPG, PNG ou WebP.");
+    return;
+  }
+
+  const combined = [...photos];
+  $("photos").disabled = true;
+  setStatus("Carregando imagens...");
+
+  try {
+    for (const file of validFiles) {
+      if (combined.length >= 30) break;
+      combined.push(await loadImage(file));
+    }
+
+    photos = combined;
+    renderThumbnails();
+
+    $("renderBtn").disabled = photos.length === 0;
+    setStatus("Fotos prontas. Você já pode pré-visualizar o vídeo.");
+    drawFrame(0);
+  } catch (error) {
+    setStatus(error.message);
+  } finally {
+    $("photos").disabled = false;
+    event.target.value = "";
+  }
+});
+
+function renderThumbnails() {
+  $("photoList").replaceChildren();
+
+  photos.forEach((photo, index) => {
+    const box = document.createElement("div");
+    box.className = "thumb";
+
+    const image = document.createElement("img");
+    image.src = photo.url;
+    image.alt = photo.name;
+
+    const name = document.createElement("span");
+    name.textContent = `${index + 1}. ${photo.name}`;
+
+    box.append(image, name);
+    $("photoList").append(box);
+  });
+
+  $("photoCount").textContent =
+    `${photos.length} foto(s) adicionada(s). Máximo: 30.`;
+}
+
+function drawImageCover(photo, progress, index, alpha = 1) {
+  const image = photo.image;
+  const cw = canvas.width;
+  const ch = canvas.height;
+
+  const scaleBase = Math.max(
+    cw / image.naturalWidth,
+    ch / image.naturalHeight
+  );
+
+  const motion = $("motion").value;
+  let zoom = 1.03;
+  let panX = 0;
+  let panY = 0;
+
+  if (motion === "zoom") {
+    zoom = 1.03 + 0.18 * progress;
+  } else if (motion === "out") {
+    zoom = 1.21 - 0.18 * progress;
+  } else if (motion === "pan") {
+    zoom = 1.13;
+    panX = (progress - 0.5) * cw * 0.12;
+  } else {
+    const type = index % 3;
+
+    if (type === 0) zoom = 1.03 + 0.18 * progress;
+    if (type === 1) zoom = 1.21 - 0.18 * progress;
+    if (type === 2) {
+      zoom = 1.12;
+      panX = (progress - 0.5) * cw * 0.10;
+    }
+  }
+
+  const scale = scaleBase * zoom;
+  const width = image.naturalWidth * scale;
+  const height = image.naturalHeight * scale;
+
+  const x = (cw - width) / 2 + panX;
+  const y = (ch - height) / 2 + panY;
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.drawImage(image, x, y, width, height);
+  ctx.restore();
+}
+
+function drawFrame(seconds) {
+  const cw = canvas.width;
+  const ch = canvas.height;
+
+  ctx.fillStyle = "#080a08";
+  ctx.fillRect(0, 0, cw, ch);
+
+  if (!photos.length) {
+    ctx.fillStyle = "#b7ff61";
+    ctx.font = `bold ${Math.max(22, cw * 0.035)}px Arial`;
+    ctx.textAlign = "center";
+    ctx.fillText("IMÓVEL MOTION AI", cw / 2, ch / 2);
+    return;
+  }
+
+  const duration = sceneSeconds();
+  const transition = Math.min(0.65, duration * 0.22);
+  const total = totalSeconds();
+
+  seconds = Math.max(0, Math.min(seconds, total - 0.001));
+
+  const index = Math.min(
+    photos.length - 1,
+    Math.floor(seconds / duration)
+  );
+
+  const local = (seconds - index * duration) / duration;
+
+  drawImageCover(photos[index], local, index, 1);
+
+  const timeLeft = duration - (seconds % duration);
+
+  if (index < photos.length - 1 && timeLeft < transition) {
+    const nextProgress = 0;
+    const alpha = 1 - timeLeft / transition;
+
+    drawImageCover(
+      photos[index + 1],
+      nextProgress,
+      index + 1,
+      alpha
+    );
+  }
+
+  // Identificação discreta do projeto.
+  ctx.save();
+  ctx.fillStyle = "rgba(0,0,0,0.48)";
+  ctx.fillRect(0, ch - 48, cw, 48);
+
+  ctx.fillStyle = "#b7ff61";
+  ctx.font = `bold ${Math.max(15, cw * 0.022)}px Arial`;
+  ctx.textAlign = "left";
+
+  const project = $("projectName").value.trim() || "IMÓVEL";
+  ctx.fillText(project.slice(0, 45), 22, ch - 19);
+  ctx.restore();
+}
+
+function animate() {
+  const elapsed = (performance.now() - animationStart) / 1000;
+
+  if (previewing) {
+    drawFrame(elapsed % Math.max(totalSeconds(), 0.1));
+  } else {
+    drawFrame(0);
+  }
+
+  raf = requestAnimationFrame(animate);
+}
+
+$("previewBtn").addEventListener("click", () => {
+  if (!photos.length) {
+    setStatus("Adicione pelo menos uma foto.");
+    return;
+  }
+
+  previewing = !previewing;
+  animationStart = performance.now();
+
+  $("previewBtn").textContent = previewing
+    ? "■ Parar prévia"
+    : "▶ Pré-visualizar";
+
+  if (!previewing) drawFrame(0);
+});
+
+$("format").addEventListener("change", resizeCanvas);
+
+["duration", "motion", "projectName"].forEach(id => {
+  $(id).addEventListener("change", () => drawFrame(0));
+});
+
+$("renderBtn").addEventListener("click", async () => {
+  if (!photos.length || recording) return;
+
+  if (!canvas.captureStream || !window.MediaRecorder) {
+    setStatus(
+      "Seu navegador não suporta gravação deste vídeo. " +
+      "Tente uma versão atualizada do Chrome ou Edge."
+    );
+    return;
+  }
+
+  const mimeType = [
+    "video/webm;codecs=vp9",
+    "video/webm;codecs=vp8",
+    "video/webm"
+  ].find(type => MediaRecorder.isTypeSupported(type));
+
+  if (!mimeType) {
+    setStatus("Nenhum formato de gravação compatível foi encontrado.");
+    return;
+  }
+
+  recording = true;
+  previewing = false;
+  $("previewBtn").textContent = "▶ Pré-visualizar";
+  $("renderBtn").disabled = true;
+  $("previewBtn").disabled = true;
+  $("photos").disabled = true;
+
+  if (downloadUrl) {
+    URL.revokeObjectURL(downloadUrl);
+    downloadUrl = null;
+  }
+
+  $("download").style.display = "none";
+  setStatus("Preparando gravação...");
+
+  const stream = canvas.captureStream(30);
+  const chunks = [];
+
+  let recorder;
+
+  try {
+    recorder = new MediaRecorder(stream, {
+      mimeType,
+      videoBitsPerSecond: 6000000
+    });
+  } catch (error) {
+    stream.getTracks().forEach(track => track.stop());
+    recording = false;
+    $("renderBtn").disabled = false;
+    $("previewBtn").disabled = false;
+    $("photos").disabled = false;
+    setStatus("Não foi possível iniciar a gravação.");
+    return;
+  }
+
+  recorder.ondataavailable = event => {
+    if (event.data && event.data.size > 0) chunks.push(event.data);
+  };
+
+  recorder.onerror = () => {
+    setStatus("Ocorreu um erro durante a gravação.");
+  };
+
+  recorder.onstop = () => {
+    stream.getTracks().forEach(track => track.stop());
+
+    const blob = new Blob(chunks, { type: mimeType });
+    downloadUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = "video-imobiliario.webm";
+    link.textContent = "Baixar vídeo imobiliário";
+
+    $("download").replaceChildren(link);
+    $("download").style.display = "block";
+
+    recording = false;
+    $("renderBtn").disabled = false;
+    $("previewBtn").disabled = false;
+    $("photos").disabled = false;
+
+    setStatus(
+      `Vídeo pronto! ${(blob.size / (1024 * 1024)).toFixed(1)} MB.`
+    );
+    drawFrame(0);
+  };
+
+  // Aguarda o primeiro frame e inicia a captura.
+  drawFrame(0);
+
+  recorder.start(250);
+
+  const start = performance.now();
+  const duration = totalSeconds();
+
+  function recordFrame(now) {
+    const elapsed = (now - start) / 1000;
+
+    drawFrame(elapsed);
+
+    setStatus(
+      `Gerando vídeo: ${Math.min(100, Math.floor(elapsed / duration * 100))}%`
+    );
+
+    if (elapsed >= duration) {
+      drawFrame(duration - 0.001);
+      recorder.stop();
+      return;
+    }
+
+    requestAnimationFrame(recordFrame);
+  }
+
+  requestAnimationFrame(recordFrame);
+});
+
+resizeCanvas();
+animate();
+</script>
+</body>
+</html>
